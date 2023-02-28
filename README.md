@@ -3,7 +3,7 @@
 
 
 # Introduction:
-The code in this repository is used to extract mineral information (Specifically 'cpx') , from abstracts of the papers related to geological rocs. The Original Data for the class label has not been added to this repository, but the code can be used for text classification as it has  parts preprocessing , training  and evaluation respectively.Feel free to modefiy the code according to your need for text classification , by editing  '__args_.train_file__' , '__args_.dev_file__'    , and args in georoc_data and args.py.
+The code in this repository is used to extract mineral information (Specifically 'cpx') , from abstracts of the papers related to geological rocs. The Original Data for the class label has not been added to this repository, but the code can be used for text classification as it has  parts preprocessing , training  and evaluation respectively.Feel free to modefiy the code according to your need for text classification , by editing  *** 'args_.train_file' , 'args_.dev_file'   ***  , and args in georoc_data and args.py.
  The pdf file,  '__presentation_georoc.pdf__'  is also the presentation I had as part of a seminar in the university of Goettingen. 
 
 ## Dependencies
