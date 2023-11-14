@@ -3,7 +3,7 @@
 
 
 # Introduction:
-The code in this repository is used to extract mineral information (Specifically 'cpx') , from abstracts of the papers related to geological rocs. The Original Data for the class label has not been added to this repository, but the code can be used for text classification as it has  parts preprocessing , training  and evaluation respectively.Feel free to modefiy the code according to your need for text classification , by editing   'args_.train_file' , 'args_.dev_file'   , and args in georoc_data and args.py respectively.
+The code in this repository is used to extract mineral information (Specifically 'cpx') , from abstracts of the papers related to geological rocks. The Original Data for the class label has not been added to this repository.  The initial idea was  to test if we  can turn a manual data entry into an automated one with the help of machine learning. Sepcifically, instead of reading paper by human, we give to an ml model, which performed quiet well. 
  The pdf file,  '__presentation_georoc.pdf__'   that I prepared as part of a presentation in DH seminar in the university of Goettingen is also included here. 
 
 ## Dependencies

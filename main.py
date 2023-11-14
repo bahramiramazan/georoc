@@ -15,24 +15,17 @@ import torchtext.datasets as datasets
 import spacy
 import GPUtil
 import warnings
-
 import math
-
 import torch
 import torch.nn as nn
 import torchtext
-
 import argparse
 from georoc_util import *
-
-
 from georoc_model import *
-# from matplotlib import pyplot as plt
+
 import pydoi
 import json
 import pandas as pd
-
-
 import csv
 
 
@@ -70,6 +63,7 @@ def georoc_collect_data():
         for row in tsv_reader:
             
             i=i+1
+            # for reading the data i had to continue from where the api was discconnected.
             if i<(468+318+231+169+64+98+75+63+42+30+21+88+180+550+280+125+1724+619+438+379+531+1160+1077+1055+1000+300):
                 continue
             (CITATIONS,DOI,AUTHORS,YEAR,TITLE,JOURNAL,VOL,ISSUE,PAGES,BOOK_TITLE,EDITOR,PUBLISHER,FORMATTED_CITATION) = row
@@ -91,8 +85,6 @@ def georoc_collect_data():
                                 continue
                       
                             # Parse document
-                            
-
                             json_acceptable_string = y.text
                             d = json.loads(json_acceptable_string)
                             # Print document
@@ -140,31 +132,21 @@ def georoc_eval(model,data):
         epoch_correct = 0
         epoch_count = 0
         model.eval()
-    
         for x in data:
-
             src=torch.cat((x[0], x[1]), 1)
             src_mask = (src != 2) 
-            
-            
             citation=x[2].data[0]
             y = x[3]
             y=list(y)
-           
             y=torch.tensor([x.item() for x in y])
-
             predictions = model(src.to(device))
             labels = y.to(device) 
-
-            
             correct = predictions.argmax(axis=1) == labels
             correct_tmp,total_tmp = correct.sum().item() , correct.size(0)
             notcorrect_tmp=correct.size(0)-correct.sum().item()
-
             PREDICTIONS.extend(predictions.argmax(axis=1).tolist())
             Y.extend(labels.tolist())
             i=i+1
-
         tp,tn,fp,fn=0,0,0,0
         for i in range(len(Y)):
             if Y[i]==0:
@@ -177,17 +159,13 @@ def georoc_eval(model,data):
                     tp=tp+1
                 else:
                     fn=fn+1
-            
             epoch_correct += correct.sum().item()
             epoch_count += correct.size(0)
-
         acc=(tp+tn)/(tp+tn+fp+fn) 
         tp_rate=(tp)/(tp+fn)
         fn_rate=fn/(tp+fn)
         tn_rate=tn/(tn+fp)
         fp_rate=fp/(tn+fp)
-        
-
         print(acc,)
         print('acc,',acc)
         print('confusion matrix',tp,tn,fp,fn)
@@ -199,19 +177,14 @@ def georoc_eval(model,data):
 def georoc_train_eval(mode='train'):
     args=DictX(Args)
     train_loader,dev_loader=georoc_data(args)
-
-
-
     DATA=get_abstracts()
     meta_data=DATA
     data=DATA
-
     epochs = 50
     word_vectors = torch_from_json(args.word_emb_file)
     model = georoc_model(
         word_vectors 
     ).to(device)
-
     if mode=='train':
         criterion = nn.CrossEntropyLoss()
         lr = 1e-4
@@ -220,17 +193,10 @@ def georoc_train_eval(mode='train'):
         )
 
     torch.manual_seed(0)
-
-    
     DATA=meta_data
-
     mineral_set,mineral_set_L=get_minerals(DATA)
-
     if mode =='eval':
         georoc_eval(model,dev_loader)
-        
-
-
     if mode=='train':
         data=train_loader#train_loader
         LOSS=[]
@@ -242,41 +208,26 @@ def georoc_train_eval(mode='train'):
                 epoch_correct = 0
                 epoch_count = 0
                 model.train()
-            
                 for x in data:
-        
                     src=torch.cat((x[0], x[1]), 1)
                     src_mask = (src != 2) 
-                    
-                    
                     citation=x[2].data[0]
                     y = x[3]
                     y=list(y)
-                   
                     y=torch.tensor([x.item() for x in y])
-
                     predictions = model(src.to(device))
                     labels = y.to(device) 
-
                     loss = criterion(predictions, labels)
                     LOSS.append(loss.item())
-
                     correct = predictions.argmax(axis=1) == labels
                     acc = correct.sum().item() / correct.size(0)
                     ACC.append(acc)
-
                     epoch_correct += correct.sum().item()
                     epoch_count += correct.size(0)
-
                     epoch_loss += loss.item()
-
                     loss.backward()
                     torch.nn.utils.clip_grad_norm_(model.parameters(), 0.5)
-
                     optimizer.step()
-                 
-        
-                
                 if mode=='train':
                     state = {
                             'epoch': epoch,
@@ -288,8 +239,7 @@ def georoc_train_eval(mode='train'):
                 georoc_eval(model,dev_loader)
 
 
-                  
-
+                
 def georoc_pre_process():
     pre_process()
 

@@ -5,34 +5,24 @@ import random
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
 import torch.utils.data as data
-
 from tqdm import tqdm
 from ujson import load as json_load
-
 import os
-
 import re
-
 import torch.nn.functional as F
 import torch.utils.data as data
-
 import numpy as np
 import ujson as json
-
 from collections import Counter
-
 import numpy as np
 import os
 import spacy
 import ujson as json
 
-
 from args import get_setup_args
 from codecs import open
 from collections import Counter
-
 import pandas as pd
 
 
@@ -103,12 +93,6 @@ class GEOROC(data.Dataset):
         self.y = torch.from_numpy(dataset['y']).long()
         self.citation_idxs = torch.from_numpy(dataset['citation_idxs']).long()
 #         self.title_char_idxs = torch.from_numpy(dataset['title_char_idxs']).long()
-
-        
-
-
-    
-
         self.ids = torch.from_numpy(dataset['ids']).long()
         self.valid_idxs = [idx for idx in range(len(self.ids))]
 
@@ -182,8 +166,6 @@ def collate_fn(examples):
 
 
 def word_tokenize(sent):
-
-
     doc = nlp(sent)
     return [token.text for token in doc]
 
@@ -204,6 +186,7 @@ def clean_text(x):
     pattern = r'[^a-zA-z0-9\s]'
     text = re.sub(pattern, '', x)
     return x
+
 def encoder_fun(mineral,mineral_set):
     encoded_mineral=torch.zeros(1,len(mineral_set))
 
@@ -213,29 +196,20 @@ def encoder_fun(mineral,mineral_set):
         i=mineral_set_L.index(m)
         encoded_mineral[0][i]=1
     return encoded_mineral
+
 def get_class(mineral_set,mineral_set_L,DATA,citation):
-
-
-
     has_cit=DATA.CITATIONS.eq(str(citation))
-
-    
     if len(DATA[has_cit]) ==0:
 
         # print("length zero")
         return "notenough"
-     
-    
     y=DATA[has_cit]
-
     u1=y["MINERAL"].unique()
     tmp=''
     for u in u1:
         tmp=tmp+str(u)+' '
 
     y=y.iloc[0]#.landorsea_ENCODED
-
-    # y=encoder_fun(y.MINERAL)
 
     y=y.MINERAL
     # tmp=y
@@ -246,9 +220,6 @@ def get_class(mineral_set,mineral_set_L,DATA,citation):
     y=y.replace("/"," ")
     y=y.replace("-"," ")
     y=y.replace("_"," ")
-
-
-
     y=encoder_fun(y,mineral_set)
     y=y[:,mineral_set_L.index("cpx")]
     y=y.to(torch.long)  
@@ -256,8 +227,6 @@ def get_class(mineral_set,mineral_set_L,DATA,citation):
     return y.item()
 
 def process_file(filename, data_type, word_counter, char_counter):
-
-
     meta_data = pd.read_csv('data//2022-12-4EZ7ID_METADATA.csv',low_memory=False)
     DATA=meta_data
     # DATA["MINERAL"]=meta_data["MINERAL"].str.replace(";", "")
@@ -278,9 +247,6 @@ def process_file(filename, data_type, word_counter, char_counter):
             mineral_set.add(str(m).lower())
  
     mineral_set_L=list(mineral_set)
-    # .split(",")
-    # print(list(DATA["MINERAL"].unique()))
-
     meta_data=DATA
     data=DATA
     print(f"Pre-processing {data_type} examples...")
@@ -292,15 +258,9 @@ def process_file(filename, data_type, word_counter, char_counter):
 
 
     for index, row in data.iterrows():
-    # print(row["Name"], row["Age"])
-      
- 
-     
         i=i+1
-        print("i",i)
         if i==100:
             break
-     
         
         abstract_tokens_L=[]
         abstract_chars_L=[]
@@ -310,15 +270,10 @@ def process_file(filename, data_type, word_counter, char_counter):
         if y=="notenough":
             print(y)
             continue
-  
-
 
         abstract_t=[]
 
         abstracts=row["ABSTRACT"] #article["ABSTRACT"]
-  
-
-
         abstracts=abstracts.replace(
             "_", ' ')
         abstract_tokens = word_tokenize(abstracts)
@@ -344,13 +299,8 @@ def process_file(filename, data_type, word_counter, char_counter):
 
         citation=row["CITATIONS"]  # article["CITATIONS"]
 
-
-
-        
         if len(title_tokens)>40:
             title_tokens=title_tokens[:40]
-
-
 
         example = {"abstract_tokens": abstract_tokens,     
                    "abstract_chars": abstract_chars,          
@@ -451,12 +401,6 @@ def build_features(args, examples, data_type, out_file, word2idx_dict, char2idx_
 
         if drop_example(example, is_test):
             continue
-
-
-
-     
-
-
         total += 1
 
         def _get_word(word):
@@ -476,22 +420,15 @@ def build_features(args, examples, data_type, out_file, word2idx_dict, char2idx_
       
 
         title_idx = np.zeros([40], dtype=np.int32)
-        title_char_idx = np.zeros([abstract_limit, char_limit], dtype=np.int32)
-
-
-            
+        title_char_idx = np.zeros([abstract_limit, char_limit], dtype=np.int32) 
 
         for i, token in enumerate(example["abstract_tokens"]):
             abstract_idx[i] = _get_word(token)
         abstract_idxs.append(abstract_idx)   
 
-
-
         for i, token in enumerate(example["title_tokens"]):
             title_idx[i] = _get_word(token)
         title_idxs.append(title_idx)
-
-
         for i, token in enumerate(example["abstract_tokens"]):
             for j, char in enumerate(token):
                 if j == char_limit:
@@ -508,10 +445,6 @@ def build_features(args, examples, data_type, out_file, word2idx_dict, char2idx_
 
         ids.append(example["id"])
         Y.append(example["y"])
-
-
-
- 
     np.savez(out_file,
              abstract_idxs=np.array(abstract_idxs),
              # abstract_char_idxs=np.array(abstract_char_idxs),

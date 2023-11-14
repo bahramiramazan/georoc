@@ -16,23 +16,18 @@ class georoc_model(nn.Module):
     """
     Text classifier based on a pytorch TransformerEncoder.
     """
-
     def __init__(
         self,
         embeddings
 
     ):
-
         super().__init__()
 
-
         vocab_size, d_model = embeddings.size()
-
         filter_sizes = [1,2,3,5]
         num_filters = 36
         embed_size=d_model
         self.emb = nn.Embedding.from_pretrained(embeddings, freeze=False)
-
 
         self.classifier = nn.Linear(144, 2)
         self.d_model = d_model

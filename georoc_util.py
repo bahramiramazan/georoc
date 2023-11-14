@@ -1,9 +1,6 @@
 import pandas as pd 
-
 import torch 
 import numpy as np
-#
-
 import numpy as np
 import random
 import torch
@@ -12,15 +9,11 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.optim.lr_scheduler as sched
 import torch.utils.data as data
-
 from collections import OrderedDict
 from json import dumps
-
 from tensorboardX import SummaryWriter
 from tqdm import tqdm
 from ujson import load as json_load
-
-
 import logging
 import os
 import queue
@@ -33,14 +26,10 @@ import torch.utils.data as data
 import tqdm
 import numpy as np
 import ujson as json
-
 from collections import Counter
-
 from georoc_data import *
-
 import httpx
 import time
-
 
 
 def scopus_paper_date(paper_doi,apikey):
@@ -88,10 +77,7 @@ def georoc_data(args):
     torch.manual_seed(args.seed)
 
     # Get embeddings
-
     word_vectors = torch_from_json(args.word_emb_file)
-
-
     print(word_vectors.shape)
 
 
